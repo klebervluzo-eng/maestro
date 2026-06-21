@@ -5,11 +5,20 @@
 
 export const SCHEMA_VERSION = "1.0";
 
-// Palavras que marcam ação de risco (irreversível, produção, credencial, dinheiro).
+// Marcadores de ação de RISCO REAL — específicos, pra não acusar ação rotineira
+// (um `git push` de feature ou um Write comum não são risco; force-push, rm -rf,
+// drop de banco, mexer em produção e credencial/dinheiro são).
 const RISKY = [
-  "deploy", "delete", "drop", "remove", "payment", "charge", "cobranca",
-  "credential", "credencial", "secret", "senha", "push", "release", "publicar",
-  "migrate", "migracao", "prod", "producao", "production", "apagar", "excluir",
+  // destrutivo irreversível
+  "rm -rf", "rm -r ", "drop table", "drop database", "delete from", "truncate",
+  "format ", "del /f", "remove-item -recurse",
+  // produção / branch protegida
+  "production", "produção", "producao", "prod ", "deploy prod",
+  "push origin main", "push origin master", "to production",
+  // força / sobrescrita
+  "--force", "force push", "push -f", "reset --hard",
+  // credencial / dinheiro
+  "payment", "charge", "credential", "private key", "secret key", "api key",
 ];
 
 const isNonEmptyString = (v) => typeof v === "string" && v.trim().length > 0;
