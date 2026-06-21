@@ -4,6 +4,7 @@ import assert from "node:assert/strict";
 import { route } from "../src/router.mjs";
 import { buildPlan, runGates, orchestrate } from "../src/orchestrator.mjs";
 import { loadAgents } from "../src/registry.mjs";
+import { govern } from "../src/governance.mjs";
 
 const AGENTS = await loadAgents();
 
@@ -57,4 +58,46 @@ test("orquestrador é defensivo contra agente com 'produces' não-string", () =>
   const malformado = [{ id: "x", name: "X", role: "r", phase: 2, keywords: ["crie"], delegatesTo: [], produces: 123 }];
   assert.doesNotThrow(() => buildPlan("crie algo", malformado));
   assert.doesNotThrow(() => runGates(buildPlan("crie algo", malformado)));
+});
+
+// ── Ponte de governança (Maestro como conselho sempre-ativo) ──
+
+test("govern APROVA ação simples sem risco", () => {
+  const v = govern({ action: "gerar um resumo de texto" });
+  assert.equal(v.verdict, "APPROVED");
+  assert.equal(v.schemaVersion, "1.0");
+});
+
+test("govern BLOQUEIA ação de risco sem aprovação humana", () => {
+  const v = govern({ action: "deploy para produção" });
+  assert.equal(v.verdict, "BLOCKED");
+});
+
+test("govern APROVA risco só com aprovação ESTRUTURADA (by+at), não booleano autodeclarado", () => {
+  // booleano autodeclarado NÃO basta
+  assert.equal(govern({ action: "deploy para produção", humanApproved: true }).verdict, "BLOCKED");
+  // aprovação estruturada (quem + quando) aprova
+  const v = govern({ action: "deploy para produção", approval: { by: "kleber", at: "2026-06-21T10:00:00Z" } });
+  assert.equal(v.verdict, "APPROVED");
+});
+
+test("govern BLOQUEIA artefato não verificado", () => {
+  const v = govern({ action: "escrever módulo", produces: "código" });
+  assert.equal(v.verdict, "BLOCKED");
+});
+
+test("govern detecta risco escondido em context/target (não só em action)", () => {
+  const v = govern({ action: "executar plano", context: "delete prod database" });
+  assert.equal(v.verdict, "BLOCKED");
+});
+
+test("govern rejeita 'risk' malformado (não-array)", () => {
+  assert.equal(govern({ action: "x", risk: "production" }).verdict, "BLOCKED");
+});
+
+test("govern é defensivo contra payload inválido (null, string, array)", () => {
+  assert.equal(govern(null).verdict, "BLOCKED");
+  assert.equal(govern("texto solto").verdict, "BLOCKED");
+  assert.equal(govern([]).verdict, "BLOCKED");
+  assert.equal(govern([]).gates[0].id, "payload-valido");
 });

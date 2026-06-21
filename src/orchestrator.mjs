@@ -92,10 +92,13 @@ export function runGates(plan) {
  * Orquestra de ponta a ponta: plano + gates.
  * Fail-closed: se um gate crítico falha, status = BLOCKED (não SUCCESS).
  */
+export const SCHEMA_VERSION = "1.0";
+
 export function orchestrate(request, agents) {
   const plan = buildPlan(request, agents);
   const gates = runGates(plan);
   return {
+    schemaVersion: SCHEMA_VERSION,
     request,
     plan,
     gates: gates.results,

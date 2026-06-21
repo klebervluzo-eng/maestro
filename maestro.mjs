@@ -1,14 +1,56 @@
 #!/usr/bin/env node
 // maestro.mjs — CLI do Maestro.
-// Uso: node maestro.mjs "seu pedido em linguagem natural"
+//
+// Modos:
+//   maestro "pedido"                 → orquestra (texto legível)
+//   maestro --json "pedido"          → orquestra (JSON, pra outro sistema ler)
+//   maestro govern  (decisão no stdin) → governa uma decisão externa, devolve veredito JSON
+//
+// O modo `govern` é a PONTE: o SINAPSE (ou qualquer sistema) manda uma decisão
+// proposta no stdin e recebe um veredito (APPROVED/BLOCKED). É o Maestro como
+// conselho sempre-ativo — não só quando chamado pra executar.
 
 import { loadAgents } from "./src/registry.mjs";
 import { orchestrate } from "./src/orchestrator.mjs";
+import { govern, reject } from "./src/governance.mjs";
 
-async function main() {
-  const request = process.argv.slice(2).join(" ").trim();
+const MAX_STDIN_BYTES = 1_000_000; // 1 MB — ponte é pra decisões, não pra payload gigante
+
+async function readStdin(maxBytes = MAX_STDIN_BYTES) {
+  const chunks = [];
+  let total = 0;
+  for await (const chunk of process.stdin) {
+    total += chunk.length;
+    if (total > maxBytes) return { tooLarge: true };
+    chunks.push(chunk);
+  }
+  return { text: Buffer.concat(chunks).toString("utf8").trim() };
+}
+
+// Todo caminho do govern devolve veredito JSON versionado (contrato machine-readable).
+function emitVerdict(verdict) {
+  console.log(JSON.stringify(verdict, null, 2));
+  process.exit(verdict.verdict === "APPROVED" ? 0 : 1);
+}
+
+async function runGovern() {
+  const { text, tooLarge } = await readStdin();
+  if (tooLarge) return emitVerdict(reject(`payload excede o limite de ${MAX_STDIN_BYTES} bytes`));
+  if (!text) return emitVerdict(reject("nenhuma decisão recebida no stdin"));
+  let decision;
+  try {
+    decision = JSON.parse(text);
+  } catch {
+    return emitVerdict(reject("JSON inválido no stdin"));
+  }
+  emitVerdict(govern(decision));
+}
+
+async function runOrchestrate(args) {
+  const asJson = args.includes("--json");
+  const request = args.filter((a) => a !== "--json").join(" ").trim();
   if (!request) {
-    console.error('Uso: maestro "seu pedido"\nEx.: maestro "pesquise o mercado e construa um relatório, depois revise"');
+    console.error('Uso: maestro "seu pedido"  |  maestro --json "seu pedido"  |  maestro govern < decisao.json');
     process.exit(2);
   }
 
@@ -22,9 +64,13 @@ async function main() {
 
   const result = orchestrate(request, agents);
 
+  if (asJson) {
+    console.log(JSON.stringify(result, null, 2));
+    process.exit(result.status === "OK" ? 0 : 1);
+  }
+
   console.log(`\n🎼  Maestro — pedido: "${result.request}"`);
   console.log("─".repeat(60));
-
   if (result.plan.steps.length === 0) {
     console.log("Nenhum agente roteado.");
   } else {
@@ -33,18 +79,23 @@ async function main() {
       console.log(`  ${i + 1}. ${s.name} (${s.role})  ← ${s.reason}`);
     });
   }
-
   console.log("\nGates de governança:");
   for (const g of result.gates) {
     const icon = g.pass ? "✅" : (g.critical ? "⛔" : "⚠️");
     console.log(`  ${icon} ${g.id}: ${g.detail}`);
   }
-
   console.log("─".repeat(60));
   console.log(`Status: ${result.status === "OK" ? "✅ OK" : "⛔ BLOCKED (gate crítico falhou)"}\n`);
-
-  // exit code reflete o status — útil pra automação encadear
   process.exit(result.status === "OK" ? 0 : 1);
+}
+
+async function main() {
+  const args = process.argv.slice(2);
+  if (args[0] === "govern") {
+    await runGovern();
+  } else {
+    await runOrchestrate(args);
+  }
 }
 
 main().catch((err) => {

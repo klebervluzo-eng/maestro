@@ -52,6 +52,25 @@ O que separa um agente de demo de um agente de produção — escrito do zero, c
 | Context Engineering | montar o contexto certo em vez de despejar |
 | RAG | recuperação que não alucina — fonte antes da resposta |
 
+## 🌉 Ponte de governança (trabalhar junto com outro sistema)
+
+O Maestro também roda como **conselho sempre-ativo**: outro sistema (um orquestrador maior, um pipeline) propõe uma decisão e o Maestro aprova ou bloqueia lendo a política — não o relato de quem propôs. É o modelo "executivo propõe, conselho aprova".
+
+```bash
+# o outro sistema manda uma decisão; o Maestro responde com veredito JSON + exit code
+echo '{"action":"deploy prod"}' | node maestro.mjs govern          # → BLOCKED (risco sem aprovação)
+echo '{"action":"deploy prod","approval":{"by":"você","at":"2026-06-21"}}' | node maestro.mjs govern  # → APPROVED
+```
+
+Ou in-process, via adaptador fino (`bridge/sinapse-adapter.mjs`), sem replicar nenhuma regra:
+
+```js
+import { enforce } from "./bridge/sinapse-adapter.mjs";
+enforce({ action: "apagar registros", produces: "migração", verified: false }); // lança se bloqueado
+```
+
+**Política dos gates de decisão:** ação de risco (deploy, delete, pagamento, credencial, produção) exige **aprovação estruturada** (`approval: { by, at }` — booleano autodeclarado não vale); quem **produz artefato** exige `verified: true`; risco é avaliado também em `context`/`target`/`environment` (não dá pra esconder). Contrato versionado (`schemaVersion`), fail-closed, limite de payload anti-DoS.
+
 ## Por que isso junto
 
 Código sem doutrina vira gambiarra; doutrina sem código vira slide. O Maestro é os dois: o **núcleo** demonstra os princípios em código rodando, e o **conhecimento** explica por que cada decisão existe. O código aponta pra doutrina; a doutrina aponta pro código.
