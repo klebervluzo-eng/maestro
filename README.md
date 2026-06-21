@@ -53,6 +53,8 @@ O que separa um agente de demo de um agente de produção — escrito do zero, c
 | RAG | recuperação que não alucina — fonte antes da resposta |
 | Memória de Agentes | o modelo esquece; o sistema é que lembra (com escopo) |
 | MCP | o padrão que conecta IA a ferramentas — e por que precisa de governança |
+| Avaliação de Agentes | sem um número repetível, "melhorou" é só opinião |
+| Sistemas Multi-Agente | dividir só vale quando a coordenação rende mais do que custa |
 
 ## 🌉 Ponte de governança (trabalhar junto com outro sistema)
 
