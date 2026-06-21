@@ -91,14 +91,16 @@ async function runOrchestrate(args) {
 
 async function main() {
   const args = process.argv.slice(2);
-  if (args[0] === "govern") {
-    await runGovern();
-  } else {
-    await runOrchestrate(args);
+  const isGovern = args[0] === "govern";
+  try {
+    if (isGovern) await runGovern();
+    else await runOrchestrate(args);
+  } catch (err) {
+    // No modo govern, até erro inesperado sai como JSON versionado (contrato consistente).
+    if (isGovern) console.log(JSON.stringify(reject(`erro inesperado: ${err.message}`), null, 2));
+    else console.error(`Erro inesperado: ${err.message}`);
+    process.exit(1);
   }
 }
 
-main().catch((err) => {
-  console.error(`Erro inesperado: ${err.message}`);
-  process.exit(1);
-});
+main();

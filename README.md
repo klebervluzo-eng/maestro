@@ -11,7 +11,7 @@ Roda de verdade, hoje, sem dependência (Node 18+):
 
 ```bash
 node maestro.mjs "pesquise o mercado e construa um relatório, depois revise"
-node --test        # 8 testes passando
+node --test        # 15 testes passando
 ```
 
 **Os agentes (cada um com sua fase no fluxo):**

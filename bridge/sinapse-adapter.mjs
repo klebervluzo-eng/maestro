@@ -4,8 +4,9 @@
 //
 // Uso a partir de outro processo (ex: um agente do SINAPSE):
 //   import { askMaestro } from "../bridge/sinapse-adapter.mjs";
-//   const verdict = await askMaestro({ action: "deploy prod", humanApproved: false });
+//   const verdict = askMaestro({ action: "deploy prod" }); // sem aprovação → BLOCKED
 //   if (verdict.verdict === "BLOCKED") { /* não prosseguir */ }
+//   // para aprovar risco: { action: "deploy prod", approval: { by, at } }
 //
 // Ou via shell (sem importar nada):
 //   echo '{"action":"deploy prod"}' | node maestro.mjs govern
