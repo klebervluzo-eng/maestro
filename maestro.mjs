@@ -13,6 +13,7 @@
 import { loadAgents } from "./src/registry.mjs";
 import { orchestrate } from "./src/orchestrator.mjs";
 import { govern, reject } from "./src/governance.mjs";
+import { logDecision } from "./src/telemetry.mjs";
 
 const MAX_STDIN_BYTES = 1_000_000; // 1 MB — ponte é pra decisões, não pra payload gigante
 
@@ -43,7 +44,15 @@ async function runGovern() {
   } catch {
     return emitVerdict(reject("JSON inválido no stdin"));
   }
-  emitVerdict(govern(decision));
+  const verdict = govern(decision);
+  // Telemetria de observação (fail-open; só grava se MAESTRO_LOG_DIR estiver setado).
+  await logDecision({
+    ts: new Date().toISOString(),
+    action: typeof decision?.action === "string" ? decision.action.slice(0, 200) : null,
+    verdict: verdict.verdict,
+    reasons: verdict.reasons,
+  });
+  emitVerdict(verdict);
 }
 
 async function runOrchestrate(args) {
