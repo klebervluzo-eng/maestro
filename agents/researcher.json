@@ -1,0 +1,10 @@
+{
+  "id": "researcher",
+  "name": "Scout",
+  "role": "Pesquisa e análise",
+  "phase": 1,
+  "description": "Levanta dados, investiga fontes e entrega evidência mapeada antes de qualquer decisão.",
+  "keywords": ["pesquise", "pesquisar", "investigue", "analise", "analisar", "levante", "dados", "fonte", "estudo", "mercado", "concorrente", "research", "descobrir"],
+  "delegatesTo": [],
+  "produces": "relatório de evidência"
+}

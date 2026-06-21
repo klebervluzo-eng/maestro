@@ -1,0 +1,17 @@
+{
+  "name": "maestro-core",
+  "version": "0.1.0",
+  "description": "Núcleo original de orquestração multi-agente: um maestro que roteia pedidos para agentes especialistas, com governança de produção embutida.",
+  "type": "module",
+  "bin": {
+    "maestro": "./maestro.mjs"
+  },
+  "scripts": {
+    "start": "node maestro.mjs",
+    "demo": "node maestro.mjs \"pesquise o mercado e construa um relatório, depois revise\""
+  },
+  "license": "MIT",
+  "engines": {
+    "node": ">=18"
+  }
+}

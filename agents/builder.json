@@ -1,0 +1,10 @@
+{
+  "id": "builder",
+  "name": "Forge",
+  "role": "Construção e implementação",
+  "phase": 2,
+  "description": "Implementa o que foi pedido a partir da evidência. Nunca constrói sem dado de entrada.",
+  "keywords": ["construa", "construir", "crie", "criar", "implemente", "implementar", "monte", "montar", "desenvolva", "desenvolver", "código", "build"],
+  "delegatesTo": ["reviewer"],
+  "produces": "artefato implementado"
+}

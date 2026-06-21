@@ -1,0 +1,10 @@
+{
+  "id": "reviewer",
+  "name": "Litmus",
+  "role": "Qualidade e verificação",
+  "phase": 3,
+  "description": "Confere o resultado contra o pedido original lendo o estado real — não confia no relato de quem construiu.",
+  "keywords": ["revise", "revisar", "valide", "validar", "confira", "conferir", "verifique", "verificar", "teste", "testar", "qualidade", "review", "auditar"],
+  "delegatesTo": [],
+  "produces": "veredito de qualidade"
+}
