@@ -14,6 +14,19 @@ node maestro.mjs "pesquise o mercado e construa um relatório, depois revise"
 node --test        # 8 testes passando
 ```
 
+**Os agentes (cada um com sua fase no fluxo):**
+
+| Fase | Agente | Papel |
+|---|---|---|
+| 0 | Atlas | Planejamento e decomposição |
+| 1 | Scout | Pesquisa e análise |
+| 1 | Vault | Arquitetura e design técnico |
+| 2 | Forge | Construção e implementação |
+| 2 | Quill | Documentação e comunicação |
+| 3 | Litmus | Qualidade e verificação |
+| 3 | Aegis | Segurança e conformidade |
+| 4 | Relay | Entrega e publicação |
+
 - **Roteamento determinístico** por intenção — barato, previsível, não depende de LLM pra rodar.
 - **Delegação em fases** — descobrir → construir → verificar, em ordem garantida (não acidental).
 - **Gates fail-closed** — gate crítico que falha bloqueia, com exit code que a automação respeita.

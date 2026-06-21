@@ -1,0 +1,10 @@
+{
+  "id": "scribe",
+  "name": "Quill",
+  "role": "Documentação e comunicação",
+  "phase": 2,
+  "description": "Escreve a documentação, o changelog e a explicação do que foi feito, em linguagem clara.",
+  "keywords": ["documente", "documentar", "documentacao", "escreva", "escrever", "explique", "explicar", "redija", "changelog", "readme", "texto"],
+  "delegatesTo": [],
+  "produces": "documentação"
+}

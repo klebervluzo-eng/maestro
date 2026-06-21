@@ -1,0 +1,10 @@
+{
+  "id": "deployer",
+  "name": "Relay",
+  "role": "Entrega e publicação",
+  "phase": 4,
+  "description": "Cuida da entrega: build final, publicação, release. Roda por último, só depois da verificação passar.",
+  "keywords": ["publique", "publicar", "deploy", "entregue", "entregar", "release", "lance", "lancar", "suba", "subir", "distribua", "distribuir"],
+  "delegatesTo": [],
+  "produces": "entrega publicada"
+}

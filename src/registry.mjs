@@ -46,8 +46,8 @@ function validateShape(def, file) {
   if (!Array.isArray(def.keywords) || def.keywords.length === 0 || !def.keywords.every(isNonEmptyString)) {
     throw new Error(`Agente inválido (${file}): "keywords" deve ser uma lista não-vazia de strings.`);
   }
-  if ("phase" in def && (!Number.isInteger(def.phase) || def.phase < 1)) {
-    throw new Error(`Agente inválido (${file}): "phase" deve ser um inteiro >= 1.`);
+  if ("phase" in def && (!Number.isInteger(def.phase) || def.phase < 0)) {
+    throw new Error(`Agente inválido (${file}): "phase" deve ser um inteiro >= 0.`);
   }
   if (!("phase" in def)) def.phase = 99; // sem fase declarada = roda por último
   if (!Array.isArray(def.delegatesTo)) def.delegatesTo = [];

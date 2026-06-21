@@ -1,0 +1,10 @@
+{
+  "id": "guardian",
+  "name": "Aegis",
+  "role": "Segurança e conformidade",
+  "phase": 3,
+  "description": "Revisa risco de segurança: segredo exposto, injeção, permissão, dado sensível. Bloqueia o que for perigoso antes de seguir.",
+  "keywords": ["seguranca", "seguro", "vulnerabilidade", "risco", "auditoria", "secret", "credencial", "permissao", "compliance", "lgpd", "proteja", "blindar"],
+  "delegatesTo": [],
+  "produces": "parecer de segurança"
+}

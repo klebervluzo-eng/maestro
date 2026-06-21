@@ -1,0 +1,10 @@
+{
+  "id": "planner",
+  "name": "Atlas",
+  "role": "Planejamento e decomposição",
+  "phase": 0,
+  "description": "Quebra um pedido grande em passos claros antes de qualquer execução. Roda primeiro de todos.",
+  "keywords": ["planeje", "planejar", "plano", "organize", "organizar", "estruture", "estruturar", "roadmap", "decomponha", "estrategia", "planejamento"],
+  "delegatesTo": [],
+  "produces": "plano de execução"
+}

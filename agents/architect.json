@@ -1,0 +1,10 @@
+{
+  "id": "architect",
+  "name": "Vault",
+  "role": "Arquitetura e design técnico",
+  "phase": 1,
+  "description": "Define a estrutura técnica e as decisões de design antes de construir. Trabalha sobre a evidência da pesquisa.",
+  "keywords": ["arquitete", "arquitetura", "design", "desenhe", "modele", "modelar", "esquema", "estrutura", "blueprint", "projete", "projetar"],
+  "delegatesTo": [],
+  "produces": "design técnico"
+}
