@@ -51,6 +51,8 @@ O que separa um agente de demo de um agente de produção — escrito do zero, c
 | 12-Factor Agents | princípios de um agente confiável |
 | Context Engineering | montar o contexto certo em vez de despejar |
 | RAG | recuperação que não alucina — fonte antes da resposta |
+| Memória de Agentes | o modelo esquece; o sistema é que lembra (com escopo) |
+| MCP | o padrão que conecta IA a ferramentas — e por que precisa de governança |
 
 ## 🌉 Ponte de governança (trabalhar junto com outro sistema)
 
