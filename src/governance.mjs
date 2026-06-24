@@ -21,6 +21,26 @@ const RISKY = [
   "payment", "charge", "credential", "private key", "secret key", "api key",
 ];
 
+// Destrutivo de ARQUIVO que vira rotina quando o alvo é EFÊMERO (tmp/scratchpad/cache/node_modules).
+// O resto do RISKY (drop/delete/truncate/format/prod/force/credencial) NUNCA rebaixa.
+const FILE_DEL = ["rm -rf", "rm -r ", "del /f", "remove-item -recurse"];
+const HARD_RISK = RISKY.filter((w) => !FILE_DEL.includes(w));
+// Caminho EFÊMERO (descartável por natureza) — apagar aqui é rotina, não risco.
+const EPHEMERAL = /(\/tmp[\/\s"']|\/tmp$|\/var\/tmp|\\temp\\|appdata\\local\\temp|[\\/]scratchpad([\\/]|$)|node_modules|[\\/]\.cache[\\/])/i;
+// Caminho SENSÍVEL (sistema/produção) — se aparecer junto, NÃO rebaixa (fail-closed).
+const SENSITIVE = /(\/etc\b|\/usr\b|\/opt\b|\/var\/(?!tmp)|c:\\windows|system32|\/boot\b|\/root\b)/i;
+
+/**
+ * Verdadeiro só quando o ÚNICO risco do texto é apagar arquivo em caminho efêmero.
+ * Qualquer risco duro (drop/prod/force/credencial) ou path sensível junto => falso (mantém risco).
+ */
+function isEphemeralDestructiveOnly(haystack) {
+  if (HARD_RISK.some((w) => haystack.includes(w))) return false; // risco duro junto
+  if (SENSITIVE.test(haystack)) return false;                    // toca path de sistema/produção
+  if (!FILE_DEL.some((w) => haystack.includes(w))) return false; // nem é destrutivo de arquivo
+  return EPHEMERAL.test(haystack);                               // destrutivo, mas só em efêmero
+}
+
 const isNonEmptyString = (v) => typeof v === "string" && v.trim().length > 0;
 const isPlainObject = (v) => v !== null && typeof v === "object" && !Array.isArray(v);
 
@@ -62,7 +82,10 @@ export function govern(decision) {
   // Gate 2 (crítico): ação de risco exige aprovação ESTRUTURADA (by + at).
   const flaggedRisk = Array.isArray(decision.risk) && decision.risk.length > 0;
   const looksRisky = RISKY.some((w) => haystack.includes(w));
-  const isRisky = flaggedRisk || looksRisky;
+  // Risco textual de apagar SÓ efêmero (tmp/scratchpad) não é risco real — evita falso-positivo.
+  // OBS: risco DECLARADO (decision.risk) nunca rebaixa — respeita quem assinou o risco.
+  const ephemeralOnly = looksRisky && !flaggedRisk && isEphemeralDestructiveOnly(haystack);
+  const isRisky = flaggedRisk || (looksRisky && !ephemeralOnly);
   const approved = isApproved(decision.approval);
   gates.push(gate("risco-precisa-aprovacao", true, !isRisky || approved,
     isRisky

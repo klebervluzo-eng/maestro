@@ -101,3 +101,23 @@ test("govern é defensivo contra payload inválido (null, string, array)", () =>
   assert.equal(govern([]).verdict, "BLOCKED");
   assert.equal(govern([]).gates[0].id, "payload-valido");
 });
+
+// ── Precisão do gate de risco: apagar SÓ efêmero é rotina, não risco (afina falso-positivo) ──
+test("govern APROVA apagar caminho efêmero (/tmp, scratchpad, node_modules)", () => {
+  assert.equal(govern({ action: "rm -rf /tmp/maestro-check" }).verdict, "APPROVED");
+  assert.equal(govern({ action: "rm -rf C:\\Users\\user\\AppData\\Local\\Temp\\claude\\x\\scratchpad" }).verdict, "APPROVED");
+  assert.equal(govern({ action: "rm -rf node_modules && npm i" }).verdict, "APPROVED");
+});
+
+test("govern MANTÉM bloqueio: apagar fora de efêmero, ou efêmero + risco duro/path sensível", () => {
+  // home não-efêmero → continua risco
+  assert.equal(govern({ action: "rm -rf ~/maestro-core" }).verdict, "BLOCKED");
+  // efêmero MAS com path de sistema junto → não rebaixa (fail-closed)
+  assert.equal(govern({ action: "rm -rf /tmp/x && rm -rf /opt/app" }).verdict, "BLOCKED");
+  // efêmero MAS com risco duro junto (deploy prod) → não rebaixa
+  assert.equal(govern({ action: "rm -rf /tmp/cache && deploy prod" }).verdict, "BLOCKED");
+  // risco DECLARADO nunca rebaixa, mesmo em tmp
+  assert.equal(govern({ action: "rm -rf /tmp/x", risk: ["destrutivo"] }).verdict, "BLOCKED");
+  // drop/truncate/format nunca rebaixam (não são FILE_DEL)
+  assert.equal(govern({ action: "truncate table /tmp/foo" }).verdict, "BLOCKED");
+});
